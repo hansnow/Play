@@ -1,7 +1,7 @@
 Play
 ====
 
-A simple BBS base on PHP
+A simple BBS based on PHP
 
 ###Done
 
