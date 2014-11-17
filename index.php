@@ -1,81 +1,105 @@
 <?php 
-require 'rb.php';
-require 'db_config.php';
-R::setup('mysql:host='.$db_host.';dbname='.$db_name,$db_user,$db_password);
-$post_list = R::getAll('SELECT * FROM pb_post ORDER BY id DESC');
-
- ?>
+session_start();
+?>
 <!DOCTYPE html>
 <html lang="zh-cmn-Hans">
 <head>
     <meta charset="UTF-8">
-    <title>PlantBooster(site4test)</title>
-    <!-- 新 Bootstrap 核心 CSS 文件 -->
-    <link rel="stylesheet" href="http://cdn.bootcss.com/bootstrap/3.3.0/css/bootstrap.min.css">
-
-    <!-- 可选的Bootstrap主题文件（一般不用引入） -->
-    <link rel="stylesheet" href="http://cdn.bootcss.com/bootstrap/3.3.0/css/bootstrap-theme.min.css">
-
-    <!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
-    <script src="http://cdn.bootcss.com/jquery/1.11.1/jquery.min.js"></script>
-
-    <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
-    <script src="http://cdn.bootcss.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
-    <script>
-    $(document).ready(function(){
-
-    });
-    </script>
+    <title>Let's play a GAME</title>
+    <link rel="stylesheet" href="http://apps.bdimg.com/libs/bootstrap/3.2.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="http://apps.bdimg.com/libs/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+    <script src="http://apps.bdimg.com/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="http://apps.bdimg.com/libs/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <script src="lib/sweetalert/sweet-alert.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="lib/sweetalert/sweet-alert.css">
+    <script src="common.js"></script>
+    <style>body { padding-top: 50px; }</style>
 </head>
 <body>
     <div class="container">
+        
+        <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+          <div class="container-fluid">
+            <div class="navbar-header">
+              <a class="navbar-brand" href="index.php">Play</a>
+            </div>
+            
+            <ul class="nav navbar-nav navbar-right">
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">帮助<span class="caret"></span></a>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a href="#">注册</a></li>
+                        <li><a href="#">使用说明</a></li>
+                        <li><a href="logout.php">注销</a></li>
+                        <li class="divider"></li>
+                        <li><a id="navbar_changelog" href="#">Change Log</a></li>
+                        <li><a id="navbar_about" href="#">关于</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <?php 
+            if($_SESSION['login']){
+                echo '<div id="login_panel" style="display:none">';
+            }else{
+                echo '<div id="login_panel">';
+            }
+            ?>
+                <button id="login" class="btn btn-default btn-sm navbar-right navbar-btn">登录</button>
+                <form class="navbar-form navbar-right" role="search">
+                  <div class="form-group">
+                    <input id="username" type="text" class="form-control" placeholder="用户名">
+                    <input id="password" type="password" class="form-control" placeholder="密码">
+                  </div>
+                </form>
+            </div>
+            <p id="welcome_text" class="navbar-text navbar-right">
+                <?php 
+                if($_SESSION['login']){
+                    echo "Welcome Back! ";
+                    echo $_SESSION['nickname'];
+                }
+                ?>
+            </p>
+          </div>
+        </nav>
+
+
+
         <div class="row">
             <div class="jumbotron">
                 <h2>LOGO HERE!</h2>
-                <span class="lable label-success">Powered By PBTeam</span>
+                <span class="lable label-success">Powered By HAN</span>
             </div>
-        </div>
-        <div class="row">
-            <div class="col-md-8">
-                <div class="panel panel-default">
-                  <div class="panel-heading">这里是最简单的测试消息</div>
-                  <div class="panel-body">
-                    <ul class="list-group">
-                      <?php 
-                      foreach($post_list as $post_item){
-                        echo '<li class="list-group-item">'.$post_item['content'].' @ '.$post_item['time'].'</li>';
-                      }
-                       ?>
-                    </ul>
-                  </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="jumbotron">
-                  <h4>请求方法</h4>
-                  <h6>url:add.php</h6>
-                  <h6>method:POST</h6>
-                  <h6>param:'content':'你要发表的内容','code':'校验码'</h6>
-                </div>
-
-                <ul class="list-group">
-                  <li class="list-group-item list-group-item-success">{"status":"0","msg":"Success"}</li>
-                  <li class="list-group-item list-group-item-warning">{"status":"1","msg":"Post Error"}</li>
-                  <li class="list-group-item list-group-item-danger">{"status":"-1","msg":"Auth Error"}</li>
-                </ul>
-            </div>
-
-        </div>
-        <div class="row">
-            <br>
-            <br>
         </div>
         <div class="row">
             <div id="main">
+                <div class="col-md-8">
+                    <div class="panel panel-default">
+                      <div class="panel-heading">这里是最简单的测试消息</div>
+                      <div class="panel-body">
+                        <ul id="content" class="list-group">
+                        
+                        </ul>
+                      </div>
+                    </div>
+                </div>
                 
-            </div>
+                <?php 
+                if($_SESSION['login']){
+                    echo '<div id="input_panel" class="col-md-4">';
+                }else{
+                    echo '<div id="input_panel" class="col-md-4" style="display:none">';
+                }
+                 ?>
+                  <div class="input-group">
+                    <input id="input" type="text" class="form-control">
+                    <button id="submit" class="btn btn-default">提交</button>
+                  </div>
+            </div>      
         </div>
+
     </div>
     
 </body>
 </html>
+
