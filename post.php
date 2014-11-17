@@ -19,7 +19,7 @@ if($_GET['type']=='all'){
      $owner = R::getRow('SELECT * FROM play_user WHERE id=:owner',[':owner'=>$post_item['owner']]);
      echo '<div id="post'.$post_item['id'].'" class="row">';
      echo '<div class="col-md-10">';
-     echo '<li class="list-group-item">'.'['.$owner['nickname'].'] '.$post_item['content'].' @ '.$post_item['date'].'</li>';
+     echo '<li class="list-group-item"><span class="badge">'.date('H:i M d',strtotime($post_item['date'])).'</span>'.'['.$owner['nickname'].'] '.$post_item['content'].'</li>';
      echo '</div>';
      echo '<div class="col-md-2">';
      
@@ -37,7 +37,7 @@ if ($_GET['type']=='new') {
   $post_item = R::getRow('SELECT * FROM play_post ORDER BY date DESC LIMIT 1');
   echo '<div id="post'.$post_item['id'].'" class="row">';
   echo '<div class="col-md-10">';
-  echo '<li class="list-group-item">'.'['.$_SESSION['nickname'].'] '.$post_item['content'].' @ '.$post_item['date'].'</li>';
+  echo '<li class="list-group-item"><span class="badge">'.date('H:i M d',strtotime($post_item['date'])).'</span>'.'['.$_SESSION['nickname'].'] '.$post_item['content'].'</li>';
   echo '</div>';
   echo '<div class="col-md-2">';
   echo '<button del="'.$post_item['id'].'" class="btn btn-danger btn-block"><span class="glyphicon glyphicon-remove"></span></button>';

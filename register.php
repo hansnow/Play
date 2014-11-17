@@ -6,17 +6,23 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $username = $_POST['username'];
     $password = $_POST['password'];
     $nickname = $_POST['nickname'];
-    $res = R::exec('INSERT INTO play_user (username,password,nickname) VALUES (:u,:p,:n)',[':u'=>$username,':p'=>$password,':n'=>$nickname]);
-    if($res){
-        $response = array('status'=>'0','message'=>'Success');
+    $exist = R::getAll('SELECT * FROM play_user WHERE username=:u',[':u'=>$_POST['username']]);
+    if($exist){
+        $response = array('status'=>'1','message'=>'Username exists in database');
         echo json_encode($response);
         die();
     }else{
-        $response = array('status'=>'-1','message'=>'fail');
-        echo json_encode($response);
-        die();
+        $res = R::exec('INSERT INTO play_user (username,password,nickname) VALUES (:u,:p,:n)',[':u'=>$username,':p'=>$password,':n'=>$nickname]);
+        if($res){
+            $response = array('status'=>'0','message'=>'Success');
+            echo json_encode($response);
+            die();
+        }else{
+            $response = array('status'=>'-1','message'=>'Error occured when access database');
+            echo json_encode($response);
+            die();
+        }
     }
-    
     
 }
 ?>
@@ -24,7 +30,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 <html lang="zh-cmn-Hans">
 <head>
     <meta charset="UTF-8">
-    <title>Let's play a GAME</title>
+    <title>Play -- Register</title>
     <link rel="stylesheet" href="http://apps.bdimg.com/libs/bootstrap/3.2.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="http://apps.bdimg.com/libs/bootstrap/3.2.0/css/bootstrap-theme.min.css">
     <script src="http://apps.bdimg.com/libs/jquery/2.1.1/jquery.min.js"></script>
@@ -53,26 +59,84 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                                 showCancelButton: false,
                                 confirmButtonColor: "#DD6B55",
                                 confirmButtonText: "跳转到首页",
-                                closeOnConfirm: false },function(){
-                                    window.location.href='index.php';
-                                });
-                        }else{
-                            swal({title:"",
-                                text: "注册失败",
+                                closeOnConfirm: false });
+                            //不知道为什么，自动登录搞不定
+                            $.post("login.php",
+                            {
+                              "username":$("#username").val(),
+                              "password":md5($("#password1").val())
+                            },function(data){
+                                window.location.href='index.php';
+                            }
+                              );
+                        }else if(response.status==1){
+                            swal({title:"注册失败",
+                                text: "用户名已存在，换一个吧",
                                 type: "error",
                                 showCancelButton: true,
                                 confirmButtonColor: "#DD6B55",
-                                confirmButtonText: "跳转到首页",
-                                closeOnConfirm: false },function(isConfirm){
-                                    if(isConfirm){
-                                        window.location.href='index.php';
-                                    }
-                                });
+                                confirmButtonText: "好吧",
+                                closeOnConfirm: false });
+                        }else{
+                            swal({title:"注册失败",
+                                text: "发生了奇怪的错误，错误代码 "+response.status+" ，请联系管理员协助解决",
+                                type: "error",
+                                showCancelButton: true,
+                                confirmButtonColor: "#DD6B55",
+                                confirmButtonText: "好吧",
+                                closeOnConfirm: false });
                         }
                     });
                 }
             }else{
                 swal("", "两次输入的密码不一致", "error");
+            }
+        });
+        $("#password2").keydown(function(event){
+            if(event.which==13){
+                if($("#password1").val() == $("#password2").val()){
+                    if($("#username").val()=="" || $("#nickname").val()=="" || $("#password1").val()=="" || $("#password2").val()==""){
+                        swal("", "用户名或昵称或密码为空", "error");
+                    }else{
+                        $.post("register.php",
+                            {
+                                "username":$("#username").val(),
+                                "password":md5($("#password1").val()),
+                                "nickname":$("#nickname").val()
+                            },function(data){
+                            response = JSON.parse(data);
+                            if(response.status == 0){
+                                swal({title:"",
+                                    text: "注册成功",
+                                    type: "success",
+                                    showCancelButton: false,
+                                    confirmButtonColor: "#DD6B55",
+                                    confirmButtonText: "跳转到首页",
+                                    closeOnConfirm: false },function(){
+                                        window.location.href='index.php';
+                                    });
+                            }else if(response.status==1){
+                                swal({title:"注册失败",
+                                    text: "用户名已存在，换一个吧",
+                                    type: "error",
+                                    showCancelButton: true,
+                                    confirmButtonColor: "#DD6B55",
+                                    confirmButtonText: "好吧",
+                                    closeOnConfirm: false });
+                            }else{
+                                swal({title:"注册失败",
+                                    text: "发生了奇怪的错误，错误代码 "+response.status+" ，请联系管理员协助解决",
+                                    type: "error",
+                                    showCancelButton: true,
+                                    confirmButtonColor: "#DD6B55",
+                                    confirmButtonText: "好吧",
+                                    closeOnConfirm: false });
+                            }
+                        });
+                    }
+                }else{
+                    swal("", "两次输入的密码不一致", "error");
+                }
             }
         });
     });

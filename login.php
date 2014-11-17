@@ -14,12 +14,16 @@ if($_POST['username'] && $_POST['password']){
     $_SESSION['nickname'] = $nickname;
     $_SESSION['login'] = 1;
     $_SESSION['userid'] = $userid;
-    echo $_SESSION['nickname'];
-    echo '|'.$_SESSION['userid'];
+    $response = array('status'=>'0','message'=>'Success','userid'=>$_SESSION['userid'],'nickname'=>$_SESSION['nickname']);
+    echo json_encode($response);
+  }else{
+    $response = array('status'=>'404','message'=>'Wrong username or password');
+    echo json_encode($response);
   }
 }else{
   $_SESSION['login'] = 0;
-  echo 'Login error';
+  $response = array('status'=>'-1','message'=>'Error in POST username or password');
+  echo json_encode($response);
 }
   
 

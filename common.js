@@ -88,24 +88,97 @@ $(document).ready(function(){
 
 
   $("#login").click(function(){
-    $.post("login.php",
-    {
-      "username":$("#username").val(),
-      "password":$("#password").val()
-    },function(data){
-      var nickname = data.split("|")[0].trim();
-      var userid = data.split("|")[1].trim();
-      $("#input_panel").css("display","");
-      $("#login_panel").hide();
-      $("#welcome_text").text("Welcome Back! "+nickname);
-      $("[noauth]").filter(function(){
-        return $(this).attr("noauth") == userid;
-      }).css("display","");
-
-
+    if($("#username").val() && $("#password").val()){
+      $.post("login.php",
+      {
+        "username":$("#username").val(),
+        "password":md5($("#password").val())
+      },function(data){
+        response = JSON.parse(data);
+        if(response.status == 0){
+          $("#input_panel").css("display","");
+          $("#login_panel").hide();
+          $("#welcome_text").text("Welcome Back! "+response.nickname);
+          $("[noauth]").filter(function(){
+            return $(this).attr("noauth") == response.userid;
+          }).css("display","");
+        }else if(response.status == 404){
+          swal({title:"登录失败",
+              text: "没有找到你所输入的用户名和密码，或者用户名密码填错了",
+              type: "error",
+              showCancelButton: false,
+              confirmButtonColor: "#DD6B55",
+              confirmButtonText: "好吧",
+              closeOnConfirm: false });
+        }else{
+          swal({title:"登录失败",
+              text: "发生了莫名其妙的错误，错误代码 "+response.status+" ，请联系管理员协助解决问题",
+              type: "error",
+              showCancelButton: false,
+              confirmButtonColor: "#DD6B55",
+              confirmButtonText: "好吧",
+              closeOnConfirm: false });
+        }
+      }
+        );
+    }else{
+      swal({title:"信息不全",
+          text: "用户名或密码为空，请重新输入",
+          type: "error",
+          showCancelButton: false,
+          confirmButtonColor: "#DD6B55",
+          confirmButtonText: "好吧",
+          closeOnConfirm: false });
     }
-      );
     
+  });
+
+  // 回车登录
+  $("#password").keydown(function(event){
+    if(event.which == 13){
+      if($("#username").val() && $("#password").val()){
+        $.post("login.php",
+        {
+          "username":$("#username").val(),
+          "password":md5($("#password").val())
+        },function(data){
+          response = JSON.parse(data);
+          if(response.status == 0){
+            $("#input_panel").css("display","");
+            $("#login_panel").hide();
+            $("#welcome_text").text("Welcome Back! "+response.nickname);
+            $("[noauth]").filter(function(){
+              return $(this).attr("noauth") == response.userid;
+            }).css("display","");
+          }else if(response.status == 404){
+            swal({title:"登录失败",
+                text: "没有找到你所输入的用户名和密码，或者用户名密码填错了",
+                type: "error",
+                showCancelButton: false,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "好吧",
+                closeOnConfirm: false });
+          }else{
+            swal({title:"登录失败",
+                text: "发生了莫名其妙的错误，错误代码 "+response.status+" ，请联系管理员协助解决问题",
+                type: "error",
+                showCancelButton: false,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "好吧",
+                closeOnConfirm: false });
+          }
+        }
+          );
+      }else{
+        swal({title:"信息不全",
+            text: "用户名或密码为空，请重新输入",
+            type: "error",
+            showCancelButton: false,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "好吧",
+            closeOnConfirm: false });
+      }
+    }
   });
 
   $("#navbar_changelog").click(function(){

@@ -12,6 +12,7 @@ session_start();
     <script src="http://apps.bdimg.com/libs/bootstrap/3.2.0/js/bootstrap.min.js"></script>
     <script src="lib/sweetalert/sweet-alert.min.js"></script>
     <link rel="stylesheet" type="text/css" href="lib/sweetalert/sweet-alert.css">
+    <script src="lib/md5.min.js"></script>
     <script src="common.js"></script>
     <style>body { padding-top: 50px; }</style>
 </head>
@@ -28,7 +29,7 @@ session_start();
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">帮助<span class="caret"></span></a>
                     <ul class="dropdown-menu" role="menu">
-                        <li><a href="#">注册</a></li>
+                        <li><a href="register.php" target="_blank">注册</a></li>
                         <li><a href="#">使用说明</a></li>
                         <li><a href="logout.php">注销</a></li>
                         <li class="divider"></li>
