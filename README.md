@@ -8,11 +8,13 @@ A simple BBS based on PHP
 + Navbar
 + User System(account only - -)
 + Ajax everywhere
++ Register
++ Friendly Tips
++ Powerful Wiki(apiaryio)
 
 ###TODO
 
 + User Guide
-+ Register System
 + User info System
 + Notification&Message System
 
